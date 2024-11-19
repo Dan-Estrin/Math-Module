@@ -3,21 +3,21 @@
 namespace Math{
     class Matrix{
         private:
-        unsigned int size;
         unsigned int rows;
         unsigned int columns;
         int* values;
 
         public:
-        Matrix(int* values, unsigned int size);
-        Matrix(int* values);
-        Matrix();
-        ~Matrix();
-        int GaussianDeterminate();
-        static int GaussianDeterminate(Matrix& matrix);
-        void operator=(Matrix& matrix);
+        Matrix(int* values, unsigned int rows, unsigned int columns);//DONE
+        Matrix(unsigned int rows, unsigned int columns);//DONE
+        ~Matrix();//DONE
+
+        double GaussianDeterminate();
+        static double GaussianDeterminate(Matrix& matrix);
+        void operator=(Matrix& matrix);//DONE
     };
 
-    float sqrt(float num);
+    double sqrt(int num);//DONE
+    double sqrt(int num, unsigned char precision);//DONE
 };
 #endif
