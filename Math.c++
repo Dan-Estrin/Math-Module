@@ -34,18 +34,29 @@ double Math::Matrix::GaussianDeterminate(){
     for(int z = 0; z < this->rows * this->columns; z++){
         valuesC[z] = this->values[z];
     }
-    for(int k = 0; k < this->columns; k++){
-        double* pivot = &valuesC[(k*this->columns)+k];
-        for(int f = 1; f < this->columns-k; f++){
-            double* next = pivot+(this->columns * f);
-            double multiplier = *next/(*pivot);
-            if (multiplier > 0) multiplier *= -1;
-            for(int i = k; i < this->rows; i++){
-                *(next+i) = *(next+i) + (*(pivot+i) * multiplier);
+    double* const first = valuesC;
+    for(int row = 0; row < this->rows-1; row++){
+        double* const pivot = first+((row*this->columns)+row);
+        double* const underPivot = pivot+this->columns;
+        std::cout<<"pivot: "<<*pivot<<std::endl;
+        std::cout<<"under pivot: "<<*underPivot<<std::endl;
+        double* currFirst = underPivot;
+        for(int currRow = row+1; currRow < this->rows; currRow++){
+            double multiplier = *currFirst/(*pivot);
+            if(*currFirst < 0 && multiplier > 0) multiplier = -1 * multiplier;
+            for(int column = 0; column+row < this->columns; column++){
+                *(currFirst+column) = *(currFirst+column) - (*(pivot+column)*multiplier);
             }
+            currFirst = currFirst + this->columns;
         }
+        //if(row == 0)break;
     }
-    for(int i = 1; i <= this->columns*this->rows; i++){std::cout<<valuesC[i-1]<<"       "; if(i%4 == 0) std::cout<<std::endl;}//TESTING
+    for(int i = 1; i <= this->columns*this->rows; i++){std::cout<<valuesC[i-1]<<'\t'; if(i%4 == 0) std::cout<<std::endl;}//TESTING
+    double determinate = 1;
+    for(int bullshit = 0; bullshit < this->columns; bullshit++){
+        determinate *= valuesC[bullshit*this->columns+bullshit];
+    }
+    std::cout << "determinate: " << determinate << std::endl;
     return 0;
 }
 
@@ -74,7 +85,7 @@ double Math::sqrt(int num, unsigned char precision){
 }
 
 int main(){
-    int temp[16] = {8,7,6,1,1,2,3,7,9,2,1,3,5,4,9,8};
+    int temp[16] = {8,7,6,1,1,2,3,7,9,3,2,5,7,4,2,1};
     int* tempP = temp;
     Math::Matrix test = Math::Matrix(tempP, 4, 4);
     test.GaussianDeterminate();
