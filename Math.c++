@@ -30,25 +30,28 @@ Math::Matrix::~Matrix(){
 }
 
 double Math::Matrix::GaussianDeterminate(){
-    int valuesC[this->rows * this->columns];
+    double valuesC[this->rows * this->columns];
     for(int z = 0; z < this->rows * this->columns; z++){
         valuesC[z] = this->values[z];
     }
     for(int k = 0; k < this->columns; k++){
-        int* pivot = &valuesC[(k*this->columns)+k];
-        int* under = &valuesC[((k+1)*this->columns)+k];
-        double rowMultiple = double((*under)/(*pivot));
-        for(int i = 0; i < this->rows; i++){
-            double elementAtKIAfterMultiplication = (*pivot) * rowMultiple;
-            *(under+i) -= elementAtKIAfterMultiplication;
+        double* pivot = &valuesC[(k*this->columns)+k];
+        for(int f = 1; f < this->columns-k; f++){
+            double* next = pivot+(this->columns * f);
+            double multiplier = *next/(*pivot);
+            if (multiplier > 0) multiplier *= -1;
+            for(int i = k; i < this->rows; i++){
+                *(next+i) = *(next+i) + (*(pivot+i) * multiplier);
+            }
         }
     }
+    for(int i = 1; i <= this->columns*this->rows; i++){std::cout<<valuesC[i-1]<<"       "; if(i%4 == 0) std::cout<<std::endl;}//TESTING
     return 0;
 }
 
-double Math::Matrix::GaussianDeterminate(Matrix& matrix){
+// double Math::Matrix::GaussianDeterminate(Matrix& matrix){
 
-}
+// }
 
 double Math::sqrt(int num){
     if(num <= 0) return 0;
@@ -71,7 +74,7 @@ double Math::sqrt(int num, unsigned char precision){
 }
 
 int main(){
-    int temp[16] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    int temp[16] = {8,7,6,1,1,2,3,7,9,2,1,3,5,4,9,8};
     int* tempP = temp;
     Math::Matrix test = Math::Matrix(tempP, 4, 4);
     test.GaussianDeterminate();
