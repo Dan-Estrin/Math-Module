@@ -1,57 +1,69 @@
 #include "Math.h++"
 #include <iostream>
 
-Math::Matrix::Matrix(int* values, unsigned int rows, unsigned int columns){
-    this->rows = rows;
-    this->columns = columns;
-    this->values = new int[rows*columns];
+template <typename mType>
+Math::Matrix<mType>::Matrix(mType* values, unsigned int rows, unsigned int columns){
+    if(rows == 1 && columns == 1) throw 100;
+    if(rows < 0 || columns < 0) throw 101;
+    this->mRows = rows;
+    this->mColumns = columns;
+    this->values = new mType[rows*columns];
     for(int i = 0; i < rows*columns; i++){
         this->values[i] = values[i];
     }
 }
 
-Math::Matrix::Matrix(unsigned int rows, unsigned int columns){
-    this->rows = rows;
-    this->columns = columns;
+template <typename mType>
+Math::Matrix<mType>::Matrix(unsigned int rows, unsigned int columns){
+    this->mRows = rows;
+    this->mColumns = columns;
     this->values = new int[rows*columns];
 }
 
-void Math::Matrix::operator=(Matrix& matrix){
-    this->rows = matrix.rows;
-    this->columns = matrix.columns;
-    this->values = new int[matrix.rows*matrix.columns];
-    for(int i = 0; i < matrix.rows*matrix.columns; i++){
+template <typename mType>
+void Math::Matrix<mType>::operator=(Matrix& matrix){
+    this->mRows = matrix.mRows;
+    this->mColumns = matrix.mColumns;
+    this->values = new int[matrix.mRows*matrix.mColumns];
+    for(int i = 0; i < matrix.mRows*matrix.mColumns; i++){
         this->values[i] = values[i];
     }
 }
 
-Math::Matrix::~Matrix(){
-    delete[] values;
+template <typename mType>
+Math::Matrix<mType>::~Matrix(){
+    delete[] this->values;
 }
 
-double Math::Matrix::GaussianDeterminate(){
-    int valuesC[this->rows * this->columns];
-    for(int z = 0; z < this->rows * this->columns; z++){
+template <typename mType>
+double Math::Matrix<mType>::GaussianDeterminate(){
+    if(this->mRows != this->mColumns || this->mRows == 1) return 0;
+    double valuesC[this->mRows * this->mColumns];
+    for(int z = 0; z < this->mRows * this->mColumns; z++){
         valuesC[z] = this->values[z];
     }
-    for(int k = 0; k < this->columns; k++){
-        int* pivot = &valuesC[(k*this->columns)+k];
-        int* under = &valuesC[((k+1)*this->columns)+k];
-        double rowMultiple = double((*under)/(*pivot));
-        for(int i = 0; i < this->rows; i++){
-            double elementAtKIAfterMultiplication = (*pivot) * rowMultiple;
-            *(under+i) -= elementAtKIAfterMultiplication;
+    double* const first = valuesC;
+    for(int row = 0; row < this->mRows-1; row++){
+        double* const pivot = first+((row*this->mColumns)+row);
+        double* currFirst = pivot+this->mColumns;
+        for(int currRow = row+1; currRow < this->mRows; currRow++){
+            double multiplier = *currFirst/(*pivot);
+            if(*currFirst < 0 && multiplier > 0) multiplier = -1 * multiplier;
+            for(int column = 0; column+row < this->mColumns; column++){
+                *(currFirst+column) = *(currFirst+column) - (*(pivot+column)*multiplier);
+            }
+            currFirst = currFirst + this->mColumns;
         }
     }
-    return 0;
+    double determinate = 1;
+    for(int bullshit = 0; bullshit < this->mColumns; bullshit++){
+        determinate *= valuesC[bullshit*this->mColumns+bullshit];
+    }
+    return determinate;
 }
 
-double Math::Matrix::GaussianDeterminate(Matrix& matrix){
-
-}
-
-double Math::sqrt(int num){
-    if(num <= 0) return 0;
+double Math::sqrt(double num){
+    if(num < 0) throw 101;
     double sqrt = 0;
     while(((sqrt+1)*(sqrt+1)) <= num){sqrt++;}
     while(((sqrt+0.1)*(sqrt+0.1)) < num){sqrt+=0.1;}
@@ -60,7 +72,8 @@ double Math::sqrt(int num){
     return sqrt;
 }
 
-double Math::sqrt(int num, unsigned char precision){
+double Math::sqrt(double num, unsigned char precision){
+    if(num < 0 || precision > 7) throw 101;
     double sqrt = 0;
     double precessor = 1;
     for(int i = 0; i <= precision; i++){
@@ -68,12 +81,4 @@ double Math::sqrt(int num, unsigned char precision){
         precessor = precessor/10;
     }
     return sqrt;
-}
-
-int main(){
-    int temp[16] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-    int* tempP = temp;
-    Math::Matrix test = Math::Matrix(tempP, 4, 4);
-    test.GaussianDeterminate();
-    return 0;
 }
