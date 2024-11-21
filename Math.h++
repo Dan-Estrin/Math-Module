@@ -1,19 +1,19 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 namespace Math{
+    template<typename mType>
     class Matrix{
         private:
-        unsigned int rows;
-        unsigned int columns;
-        int* values;
+        unsigned int mRows;
+        unsigned int mColumns;
+        mType* values;
 
         public:
-        Matrix(int* values, unsigned int rows, unsigned int columns);//DONE
+        Matrix(mType* values, unsigned int rows, unsigned int columns);//DONE
         Matrix(unsigned int rows, unsigned int columns);//DONE
         ~Matrix();//DONE
 
-        double GaussianDeterminate();
-        static double GaussianDeterminate(Matrix& matrix);
+        double GaussianDeterminate();//DONE
         void operator=(Matrix& matrix);//DONE
     };
 

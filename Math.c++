@@ -1,68 +1,66 @@
 #include "Math.h++"
 #include <iostream>
 
-Math::Matrix::Matrix(int* values, unsigned int rows, unsigned int columns){
-    this->rows = rows;
-    this->columns = columns;
-    this->values = new int[rows*columns];
+template <typename mType>
+Math::Matrix<mType>::Matrix(mType* values, unsigned int rows, unsigned int columns){
+    if(rows == 1 && columns == 1) throw 100;
+    if(rows < 0 || columns < 0) throw 101;
+    this->mRows = rows;
+    this->mColumns = columns;
+    this->values = new mType[rows*columns];
     for(int i = 0; i < rows*columns; i++){
         this->values[i] = values[i];
     }
 }
 
-Math::Matrix::Matrix(unsigned int rows, unsigned int columns){
-    this->rows = rows;
-    this->columns = columns;
+template <typename mType>
+Math::Matrix<mType>::Matrix(unsigned int rows, unsigned int columns){
+    this->mRows = rows;
+    this->mColumns = columns;
     this->values = new int[rows*columns];
 }
 
-void Math::Matrix::operator=(Matrix& matrix){
-    this->rows = matrix.rows;
-    this->columns = matrix.columns;
-    this->values = new int[matrix.rows*matrix.columns];
-    for(int i = 0; i < matrix.rows*matrix.columns; i++){
+template <typename mType>
+void Math::Matrix<mType>::operator=(Matrix& matrix){
+    this->mRows = matrix.mRows;
+    this->mColumns = matrix.mColumns;
+    this->values = new int[matrix.mRows*matrix.mColumns];
+    for(int i = 0; i < matrix.mRows*matrix.mColumns; i++){
         this->values[i] = values[i];
     }
 }
 
-Math::Matrix::~Matrix(){
-    delete[] values;
+template <typename mType>
+Math::Matrix<mType>::~Matrix(){
+    delete[] this->values;
 }
 
-double Math::Matrix::GaussianDeterminate(){
-    double valuesC[this->rows * this->columns];
-    for(int z = 0; z < this->rows * this->columns; z++){
+template <typename mType>
+double Math::Matrix<mType>::GaussianDeterminate(){
+    if(this->mRows != this->mColumns || this->mRows == 1) return 0;
+    double valuesC[this->mRows * this->mColumns];
+    for(int z = 0; z < this->mRows * this->mColumns; z++){
         valuesC[z] = this->values[z];
     }
     double* const first = valuesC;
-    for(int row = 0; row < this->rows-1; row++){
-        double* const pivot = first+((row*this->columns)+row);
-        double* const underPivot = pivot+this->columns;
-        std::cout<<"pivot: "<<*pivot<<std::endl;
-        std::cout<<"under pivot: "<<*underPivot<<std::endl;
-        double* currFirst = underPivot;
-        for(int currRow = row+1; currRow < this->rows; currRow++){
+    for(int row = 0; row < this->mRows-1; row++){
+        double* const pivot = first+((row*this->mColumns)+row);
+        double* currFirst = pivot+this->mColumns;
+        for(int currRow = row+1; currRow < this->mRows; currRow++){
             double multiplier = *currFirst/(*pivot);
             if(*currFirst < 0 && multiplier > 0) multiplier = -1 * multiplier;
-            for(int column = 0; column+row < this->columns; column++){
+            for(int column = 0; column+row < this->mColumns; column++){
                 *(currFirst+column) = *(currFirst+column) - (*(pivot+column)*multiplier);
             }
-            currFirst = currFirst + this->columns;
+            currFirst = currFirst + this->mColumns;
         }
-        //if(row == 0)break;
     }
-    for(int i = 1; i <= this->columns*this->rows; i++){std::cout<<valuesC[i-1]<<'\t'; if(i%4 == 0) std::cout<<std::endl;}//TESTING
     double determinate = 1;
-    for(int bullshit = 0; bullshit < this->columns; bullshit++){
-        determinate *= valuesC[bullshit*this->columns+bullshit];
+    for(int bullshit = 0; bullshit < this->mColumns; bullshit++){
+        determinate *= valuesC[bullshit*this->mColumns+bullshit];
     }
-    std::cout << "determinate: " << determinate << std::endl;
-    return 0;
+    return determinate;
 }
-
-// double Math::Matrix::GaussianDeterminate(Matrix& matrix){
-
-// }
 
 double Math::sqrt(int num){
     if(num <= 0) return 0;
@@ -85,9 +83,9 @@ double Math::sqrt(int num, unsigned char precision){
 }
 
 int main(){
-    int temp[16] = {8,7,6,1,1,2,3,7,9,3,2,5,7,4,2,1};
-    int* tempP = temp;
-    Math::Matrix test = Math::Matrix(tempP, 4, 4);
-    test.GaussianDeterminate();
+    double temp[9] = {1,2,8,0,7,6,4,3,1};
+    double* tempP = temp;
+    Math::Matrix test = Math::Matrix(tempP, 3, 3);
+    std::cout<<test.GaussianDeterminate();
     return 0;
 }
