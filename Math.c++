@@ -62,8 +62,8 @@ double Math::Matrix<mType>::GaussianDeterminate(){
     return determinate;
 }
 
-double Math::sqrt(int num){
-    if(num <= 0) return 0;
+double Math::sqrt(double num){
+    if(num < 0) throw 101;
     double sqrt = 0;
     while(((sqrt+1)*(sqrt+1)) <= num){sqrt++;}
     while(((sqrt+0.1)*(sqrt+0.1)) < num){sqrt+=0.1;}
@@ -72,7 +72,8 @@ double Math::sqrt(int num){
     return sqrt;
 }
 
-double Math::sqrt(int num, unsigned char precision){
+double Math::sqrt(double num, unsigned char precision){
+    if(num < 0 || precision > 7) throw 101;
     double sqrt = 0;
     double precessor = 1;
     for(int i = 0; i <= precision; i++){
@@ -80,12 +81,4 @@ double Math::sqrt(int num, unsigned char precision){
         precessor = precessor/10;
     }
     return sqrt;
-}
-
-int main(){
-    double temp[9] = {1,2,8,0,7,6,4,3,1};
-    double* tempP = temp;
-    Math::Matrix test = Math::Matrix(tempP, 3, 3);
-    std::cout<<test.GaussianDeterminate();
-    return 0;
 }

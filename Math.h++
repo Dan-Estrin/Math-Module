@@ -17,7 +17,7 @@ namespace Math{
         void operator=(Matrix& matrix);//DONE
     };
 
-    double sqrt(int num);//DONE
-    double sqrt(int num, unsigned char precision);//DONE
+    double sqrt(double num);//DONE
+    double sqrt(double num, unsigned char precision);//DONE
 };
 #endif
