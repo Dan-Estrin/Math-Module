@@ -42,9 +42,8 @@ double Math::Matrix<mType>::GaussianDeterminate(){
     for(int z = 0; z < this->mRows * this->mColumns; z++){
         valuesC[z] = this->values[z];
     }
-    double* const first = valuesC;
     for(int row = 0; row < this->mRows-1; row++){
-        double* const pivot = first+((row*this->mColumns)+row);
+        double* const pivot = valuesC+((row*this->mColumns)+row);
         double* currFirst = pivot+this->mColumns;
         for(int currRow = row+1; currRow < this->mRows; currRow++){
             double multiplier = *currFirst/(*pivot);
@@ -62,7 +61,7 @@ double Math::Matrix<mType>::GaussianDeterminate(){
     return determinate;
 }
 
-double Math::sqrt(double num){
+double Math::BasicComp::sqrt(double num){
     if(num < 0) throw 101;
     double sqrt = 0;
     while(((sqrt+1)*(sqrt+1)) <= num){sqrt++;}
@@ -72,7 +71,7 @@ double Math::sqrt(double num){
     return sqrt;
 }
 
-double Math::sqrt(double num, unsigned char precision){
+double Math::BasicComp::sqrt(double num, unsigned char precision){
     if(num < 0 || precision > 7) throw 101;
     double sqrt = 0;
     double precessor = 1;
@@ -81,4 +80,60 @@ double Math::sqrt(double num, unsigned char precision){
         precessor = precessor/10;
     }
     return sqrt;
+}
+
+double Math::BasicComp::CircleArea(double radius){
+    if(radius < 0) throw 100;
+    return 3.142*radius*radius;
+}
+
+int Math::BasicComp::pow(int base, int exponent){
+    if(exponent == 0) return 1;
+    int ans = 1;
+    while(exponent > 0){
+        if(exponent & 1) ans *= base;
+    }
+    base *= base;
+    exponent = exponent >> 1;
+    return ans;
+}
+
+double Math::BasicComp::pow(double base, int exponent){
+    if(exponent == 0) return 1;
+    double ans = 1;
+    while(exponent > 0){
+        if(exponent & 1) ans *= base;
+    }
+    base *= base;
+    exponent = exponent >> 1;
+    return ans;
+}
+
+void Math::Equation::Normalize(char* equation){
+    unsigned int index = 0;
+    unsigned int nLen = 0;
+    while(equation[index] != '\0'){
+        if(equation[index] != ' '){
+            nLen++;
+        }
+        index++;
+    }
+    this->equation = new char[nLen+1];
+    unsigned short offset = 0;
+    for(int i = 0; i < nLen; i++){
+        if(equation[i] == ' '){
+            offset++;
+        }
+        this->equation[i] = equation[i + offset];
+    }
+    this->equation[nLen-1] = equation[nLen + offset];
+    this->equation[nLen] = '\0';
+}
+
+Math::Equation::Equation(char* equation, unsigned short length){
+
+}
+
+Math::Equation::Equation(char* equation){
+    
 }
