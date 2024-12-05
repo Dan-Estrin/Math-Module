@@ -1,5 +1,4 @@
 #include "Math.h++"
-#include <iostream>
 
 template <typename mType>
 Math::Matrix<mType>::Matrix(mType* values, unsigned int rows, unsigned int columns){
@@ -21,12 +20,19 @@ Math::Matrix<mType>::Matrix(unsigned int rows, unsigned int columns){
 }
 
 template <typename mType>
+Math::Matrix<mType>::Matrix(){
+    this->mColumns = 0;
+    this->mRows = 0;
+    this->values = nullptr;
+}
+
+template <typename mType>
 void Math::Matrix<mType>::operator=(Matrix& matrix){
     this->mRows = matrix.mRows;
     this->mColumns = matrix.mColumns;
-    this->values = new int[matrix.mRows*matrix.mColumns];
-    for(int i = 0; i < matrix.mRows*matrix.mColumns; i++){
-        this->values[i] = values[i];
+    this->values = new mType[this->mRows*this->mColumns];
+    for(int i = 0; i < this->mRows*this->mColumns; i++){
+        this->values[i] = matrix.values[i];
     }
 }
 
@@ -60,6 +66,16 @@ double Math::Matrix<mType>::GaussianDeterminate(){
     }
     return determinate;
 }
+
+// template <typename mType>
+// Math::Matrix<mType> Math::Matrix<mType>::operator*(Math::Matrix<mType>& matrix){
+//     if(this->mColumns != matrix->mRows) throw (700);
+//     mType* const tMatrix = new mType[this->mColumns * matrix->mRows];
+//     for(int i = 0; i < this->mColumns * matrix->mRows; i++){
+//         mType* const element = tMatrix + i;
+//         *element = 
+//     }
+// }
 
 double Math::BasicComp::sqrt(double num){
     if(num < 0) throw 101;
@@ -120,20 +136,29 @@ void Math::Equation::Normalize(char* equation){
     }
     this->equation = new char[nLen+1];
     unsigned short offset = 0;
-    for(int i = 0; i < nLen; i++){
-        if(equation[i] == ' '){
+    for(int i = 0; i < index; i++){
+        if(equation[i] != ' '){
+            this->equation[offset] = equation[i];
             offset++;
         }
-        this->equation[i] = equation[i + offset];
     }
-    this->equation[nLen-1] = equation[nLen + offset];
     this->equation[nLen] = '\0';
-}
-
-Math::Equation::Equation(char* equation, unsigned short length){
-
+    this->len = nLen+1;
 }
 
 Math::Equation::Equation(char* equation){
-    
+    Normalize(equation);
+}
+
+Math::Equation::Equation(){
+    this->len = 0;
+    this->equation = nullptr;
+}
+
+Math::Equation::~Equation(){
+    delete[] this->equation;
+}
+
+void Math::Equation::operator=(Equation& cEquation){
+    this->Normalize(cEquation.equation);
 }
