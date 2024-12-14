@@ -1,81 +1,89 @@
 #include "Math.h++"
 
 template <typename mType>
-Math::Matrix<mType>::Matrix(mType* values, unsigned int rows, unsigned int columns){
+Math::Matrix<mType>::Matrix(mType* vals, unsigned int rows, unsigned int columns){
     if(rows == 1 && columns == 1) throw 100;
     if(rows < 0 || columns < 0) throw 101;
-    this->mRows = rows;
-    this->mColumns = columns;
-    this->values = new mType[rows*columns];
+    this->rows = rows;
+    this->cols = columns;
+    this->vals = new mType[rows*columns];
     for(int i = 0; i < rows*columns; i++){
-        this->values[i] = values[i];
+        this->vals[i] = vals[i];
     }
 }
 
 template <typename mType>
 Math::Matrix<mType>::Matrix(unsigned int rows, unsigned int columns){
-    this->mRows = rows;
-    this->mColumns = columns;
-    this->values = new int[rows*columns];
+    this->rows = rows;
+    this->cols = columns;
+    this->vals = new int[rows*columns];
 }
 
 template <typename mType>
 Math::Matrix<mType>::Matrix(){
-    this->mColumns = 0;
-    this->mRows = 0;
-    this->values = nullptr;
+    this->cols = 0;
+    this->rows = 0;
+    this->vals = nullptr;
 }
 
 template <typename mType>
-void Math::Matrix<mType>::operator=(Matrix& matrix){
-    this->mRows = matrix.mRows;
-    this->mColumns = matrix.mColumns;
-    this->values = new mType[this->mRows*this->mColumns];
-    for(int i = 0; i < this->mRows*this->mColumns; i++){
-        this->values[i] = matrix.values[i];
+void Math::Matrix<mType>::operator=(Matrix& mtx){
+    this->rows = mtx.rows;
+    this->cols = mtx.cols;
+    this->vals = new mType[this->rows*this->cols];
+    for(int i = 0; i < this->rows*this->cols; i++){
+        this->vals[i] = mtx.vals[i];
     }
 }
 
 template <typename mType>
 Math::Matrix<mType>::~Matrix(){
-    delete[] this->values;
+    delete[] this->vals;
 }
 
 template <typename mType>
 double Math::Matrix<mType>::GaussianDeterminate(){
-    if(this->mRows != this->mColumns || this->mRows == 1) return 0;
-    double valuesC[this->mRows * this->mColumns];
-    for(int z = 0; z < this->mRows * this->mColumns; z++){
-        valuesC[z] = this->values[z];
+    if(this->rows != this->cols || this->rows == 1) return 0;
+    double valsC[this->rows * this->cols];
+    for(int z = 0; z < this->rows * this->cols; z++){
+        valsC[z] = this->vals[z];
     }
-    for(int row = 0; row < this->mRows-1; row++){
-        double* const pivot = valuesC+((row*this->mColumns)+row);
-        double* currFirst = pivot+this->mColumns;
-        for(int currRow = row+1; currRow < this->mRows; currRow++){
+    for(int row = 0; row < this->rows-1; row++){
+        double* const pivot = valsC+((row*this->cols)+row);
+        double* currFirst = pivot+this->cols;
+        for(int currRow = row+1; currRow < this->rows; currRow++){
             double multiplier = *currFirst/(*pivot);
             if(*currFirst < 0 && multiplier > 0) multiplier = -1 * multiplier;
-            for(int column = 0; column+row < this->mColumns; column++){
+            for(int column = 0; column+row < this->cols; column++){
                 *(currFirst+column) = *(currFirst+column) - (*(pivot+column)*multiplier);
             }
-            currFirst = currFirst + this->mColumns;
+            currFirst = currFirst + this->cols;
         }
     }
-    double determinate = 1;
-    for(int bullshit = 0; bullshit < this->mColumns; bullshit++){
-        determinate *= valuesC[bullshit*this->mColumns+bullshit];
+    double det = 1;
+    for(int diag = 0; diag < this->cols; diag++){
+        det *= valsC[diag*this->cols+diag];
     }
-    return determinate;
+    return det;
 }
 
-// template <typename mType>
-// Math::Matrix<mType> Math::Matrix<mType>::operator*(Math::Matrix<mType>& matrix){
-//     if(this->mColumns != matrix->mRows) throw (700);
-//     mType* const tMatrix = new mType[this->mColumns * matrix->mRows];
-//     for(int i = 0; i < this->mColumns * matrix->mRows; i++){
-//         mType* const element = tMatrix + i;
-//         *element = 
-//     }
-// }
+template <typename mType>
+Math::Matrix<mType> Math::Matrix<mType>::operator*(Math::Matrix<mType>& mtxB){
+    if(this->cols != mtxB.rows) throw (700);
+    mType* const tArray = new mType[this->rows * mtxB.cols];
+    for(int iElem = 0; iElem < this->rows * mtxB.cols; iElem++){
+        int tSum = 0;
+        int row = iElem/(mtxB.cols);
+        int col = iElem%(mtxB.cols);
+        //this can be done because the col & row of matrixies A and B are equal, so num of
+        //elements can be assumed same
+        for(int offset = 0; offset < this->cols; offset++){
+            tSum += this->vals[(row * this->cols) + offset] * mtxB.vals[(mtxB.cols * offset) + col];
+        }
+        tArray[iElem] = tSum;
+    }
+    return Math::Matrix<mType>(tArray, this->rows, mtxB.cols);
+}
 
 double Math::BasicComp::sqrt(double num){
     if(num < 0) throw 101;

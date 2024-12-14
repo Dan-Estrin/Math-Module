@@ -5,19 +5,19 @@ namespace Math{
     class Matrix{
         // TODO: make private after testing is done
         public:
-        unsigned int mRows;
-        unsigned int mColumns;
-        mType* values;
+        unsigned int rows;
+        unsigned int cols;
+        mType* vals;
 
         public:
-        Matrix(mType* values, unsigned int rows, unsigned int columns);//DONE
+        Matrix(mType* vals, unsigned int rows, unsigned int columns);//DONE
         Matrix(unsigned int rows, unsigned int columns);//DONE
         Matrix();//DONE
         ~Matrix();//DONE
 
         double GaussianDeterminate();//DONE
-        // Matrix<mType> operator*(Matrix<mType>& matrix);
-        void operator=(Matrix<mType>& matrix);//DONE
+        Matrix<mType> operator*(Matrix<mType>& mtxB);//DONE
+        void operator=(Matrix<mType>& mtx);//DONE
     };
 
     class Equation{
