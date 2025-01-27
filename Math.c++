@@ -170,3 +170,5 @@ Math::Equation::~Equation(){
 void Math::Equation::operator=(Equation& cEquation){
     this->Normalize(cEquation.equation);
 }
+
+/*some random additions for testing*/
