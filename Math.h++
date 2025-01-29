@@ -32,7 +32,7 @@ namespace Math{
       Equation();//DONE
       ~Equation();//DONE
       void operator=(Equation& cEquation);//DONE
-      // double YIntercept();
+      double YIntercept();
       // char* Derivative(char vod);
       // char* InDefIntegral(char voi);
       // char* DefIntegral(char voi);

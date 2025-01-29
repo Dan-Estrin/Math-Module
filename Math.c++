@@ -43,28 +43,37 @@ Math::Matrix<mType>::~Matrix(){
 
 template <typename mType>
 double Math::Matrix<mType>::GaussianDeterminate(){
-    if(this->rows != this->cols || this->rows == 1) return 0;
-    double valsC[this->rows * this->cols];
-    for(int z = 0; z < this->rows * this->cols; z++){
-        valsC[z] = this->vals[z];
+  if(this->rows != this->cols || this->rows == 1) return 0;
+  double valsC[this->rows * this->cols];
+  for(int z = 0; z < this->rows * this->cols; z++){
+    valsC[z] = (double)this->vals[z];
+  }
+  double det = 1;
+  for(int row = 0; row < this->rows-1; row++){
+    double* pivot = valsC+(row*this->cols)+row;
+    double* currFirst = pivot+this->cols;
+    if(*pivot == 0){
+      double temp;
+      for(int column = 0; column+row < this->cols; column++){
+        temp = *(pivot+column);
+        *(pivot+column) = *(currFirst+column);
+        *(currFirst+column) = temp;
+      }
+      det *= -1;
     }
-    for(int row = 0; row < this->rows-1; row++){
-        double* const pivot = valsC+((row*this->cols)+row);
-        double* currFirst = pivot+this->cols;
-        for(int currRow = row+1; currRow < this->rows; currRow++){
-            double multiplier = *currFirst/(*pivot);
-            if(*currFirst < 0 && multiplier > 0) multiplier = -1 * multiplier;
-            for(int column = 0; column+row < this->cols; column++){
-                *(currFirst+column) = *(currFirst+column) - (*(pivot+column)*multiplier);
-            }
-            currFirst = currFirst + this->cols;
-        }
+    for(int currRow = row+1; currRow < this->rows; currRow++){
+      double multiplier = *currFirst/(*pivot);
+      if(*currFirst < 0 && multiplier > 0 && det > 0) multiplier = -1 * multiplier;
+      for(int column = 0; column+row < this->cols; column++){
+        *(currFirst+column) = *(currFirst+column) - (*(pivot+column)*multiplier);
+      }
+      currFirst = currFirst + this->cols;
     }
-    double det = 1;
-    for(int diag = 0; diag < this->cols; diag++){
-        det *= valsC[diag*this->cols+diag];
-    }
-    return det;
+  }
+  for(int diag = 0; diag < this->cols; diag++){
+    det *= valsC[diag*this->cols+diag];
+  }
+  return det;
 }
 
 template <typename mType>
@@ -171,4 +180,16 @@ void Math::Equation::operator=(Equation& cEquation){
     this->Normalize(cEquation.equation);
 }
 
-/*some random additions for testing*/
+// double Math::Equation::YIntercept(){
+//   //add checking to make sure that the equation can actually be
+//   //interpriated in a proper way either here or in Normalize
+//   int opens[10] = {};
+//   int openS = 0;
+//   int closes[10] = {};
+//   int closeS = 0;
+//   for(int i = 0; i < this->len; i++){
+//     if(this->equation[i] == '(') {opens[openS] = i; openS++;}
+//     if(this->equation[i] == ')') {closes[closeS] = i; closeS++;}
+//   }
+  
+// }
