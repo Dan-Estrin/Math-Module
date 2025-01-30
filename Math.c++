@@ -180,16 +180,15 @@ void Math::Equation::operator=(Equation& cEquation){
     this->Normalize(cEquation.equation);
 }
 
-// double Math::Equation::YIntercept(){
-//   //add checking to make sure that the equation can actually be
-//   //interpriated in a proper way either here or in Normalize
-//   int opens[10] = {};
-//   int openS = 0;
-//   int closes[10] = {};
-//   int closeS = 0;
-//   for(int i = 0; i < this->len; i++){
-//     if(this->equation[i] == '(') {opens[openS] = i; openS++;}
-//     if(this->equation[i] == ')') {closes[closeS] = i; closeS++;}
-//   }
-  
-// }
+double Math::Equation::YIntercept(){
+  //add checking to make sure that the equation can actually be
+  //interpriated in a proper way either here or in Normalize
+  int opens[10] = {};
+  int openS = 0;
+  int closes[10] = {};
+  int closeS = 0;
+  for(int i = 0; i < this->len; i++){
+    if(this->equation[i] == '(') {opens[openS] = i; openS++;}
+    if(this->equation[i] == ')') {closes[closeS] = i; closeS++;}
+  }
+}
