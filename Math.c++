@@ -27,7 +27,7 @@ Math::Matrix<mType>::Matrix(){
 }
 
 template <typename mType>
-void Math::Matrix<mType>::operator=(Matrix& mtx){
+void Math::Matrix<mType>::operator=(Matrix<mType>& mtx){
   this->rows = mtx.rows;
   this->cols = mtx.cols;
   this->vals = new mType[this->rows*this->cols];
@@ -43,11 +43,14 @@ Math::Matrix<mType>::~Matrix(){
 
 template <typename mType>
 double Math::Matrix<mType>::GaussianDeterminate(){
-  if(this->rows != this->cols || this->rows == 1) return 0;
+  //impossible to find the determinate, return nothing
+  if(this->rows != this->cols || this->rows == 1) throw(700);
   double valsC[this->rows * this->cols];
   for(short z = 0; z < this->rows * this->cols; z++){
+    //explicite cast to avoid bit loss
     valsC[z] = (double)this->vals[z];
   }
+  //main row itteration step
   for(short row = 0; row < this->rows-1; row++){
     double* const pivot = valsC+(row*this->cols)+row;
     double* currFirst = pivot+this->cols;
@@ -59,10 +62,10 @@ double Math::Matrix<mType>::GaussianDeterminate(){
         *(currFirst+column) = temp;
       }
     }
+    //changing row itteration step
     for(short currRow = row+1; currRow < this->rows; currRow++){
       const double multiplier = *currFirst/(*pivot);
-      //if(*currFirst < 0 && multiplier > 0) multiplier = -1 * multiplier;
-      //comment left for further testing - removed to account for row swapping
+      //element itteration step
       for(short column = 0; column+row < this->cols; column++){
         *(currFirst+column) = *(currFirst+column) - (*(pivot+column)*multiplier);
       }
@@ -71,30 +74,54 @@ double Math::Matrix<mType>::GaussianDeterminate(){
   }
   double det = 1;
   for(short diag = 0; diag < this->cols; diag++){
-    det *= valsC[diag*this->cols+diag];
+    det *= valsC[(diag*this->cols)+diag];
   }
   return det;
 }
 
 template <typename mType>
-Math::Matrix<mType> Math::Matrix<mType>::operator*(Math::Matrix<mType>& mtxB){
-  if(this->cols != mtxB.rows) throw (700);
-  mType* const tArray = new mType[this->rows * mtxB.cols];
-  for(int iElem = 0; iElem < this->rows * mtxB.cols; iElem++){
+mType Math::Matrix<mType>::ElementAt(unsigned short index){
+  if(index > this->rows*this->cols ||index <= 0) throw (700);
+  return this->vals[index-1];
+}
+
+template <typename mType>
+mType Math::Matrix<mType>::ElementAt(unsigned short row, unsigned short col){
+  if(row > this->rows || col < this->col ||
+    row <= 0 || col <= 0
+  ) throw (700);
+  return this->vals[(this->cols*row) + col - 1];
+}
+
+template <typename mType>
+Math::Matrix<mType> Math::Matrix<mType>::operator*(Math::Matrix<mType>& mtx){
+  if(this->cols != mtx.rows) throw (700);
+  mType* const tArray = new mType[this->rows * mtx.cols];
+  for(int iElem = 0; iElem < this->rows * mtx.cols; iElem++){
     int tSum = 0;
-    int row = iElem/(mtxB.cols);
-    int col = iElem%(mtxB.cols);
+    int row = iElem/(mtx.cols);
+    int col = iElem%(mtx.cols);
     //this can be done because the col & row of matrixies A and B are equal, so num of
     //elements can be assumed same
     for(int offset = 0; offset < this->cols; offset++){
-        tSum += this->vals[(row * this->cols) + offset] * mtxB.vals[(mtxB.cols * offset) + col];
+        tSum += this->vals[(row * this->cols) + offset] * mtx.vals[(mtx.cols * offset) + col];
     }
     tArray[iElem] = tSum;
   }
-  return Math::Matrix<mType>(tArray, this->rows, mtxB.cols);
+  return Math::Matrix<mType>(tArray, this->rows, mtx.cols);
 }
 
-double Math::BasicComp::sqrt(double num){
+template<typename mType>
+Math::Matrix<mType> Math::Matrix<mType>::operator+(Math::Matrix<mType>& mtx){
+  if(this->rows != mtx.rows || this->cols != mtx.cols) throw(700);
+  mType tArray[this->rows * this->cols];
+  for(int i = 0; i < this->cols * this->rows; i++){
+    tArray[i] = this->vals[i] + mtx.vals[i];
+  }
+  return Math::Matrix<mType>(tArray, this->rows, this->cols);
+}
+
+double Math::BasicComp::Sqrt(double num){
   if(num < 0) throw 101;
   double sqrt = 0;
   while(((sqrt+1)*(sqrt+1)) <= num){sqrt++;}
@@ -104,7 +131,7 @@ double Math::BasicComp::sqrt(double num){
   return sqrt;
 }
 
-double Math::BasicComp::sqrt(double num, unsigned char precision){
+double Math::BasicComp::Sqrt(double num, unsigned char precision){
   if(num < 0 || precision > 7) throw 101;
   double sqrt = 0;
   double precessor = 1;
@@ -120,7 +147,7 @@ double Math::BasicComp::CircleArea(double radius){
   return 3.142*radius*radius;
 }
 
-int Math::BasicComp::pow(int base, int exponent){
+int Math::BasicComp::Pow(int base, int exponent){
   if(exponent == 0) return 1;
   int ans = 1;
   while(exponent > 0){
@@ -131,7 +158,7 @@ int Math::BasicComp::pow(int base, int exponent){
   return ans;
 }
 
-double Math::BasicComp::pow(double base, int exponent){
+double Math::BasicComp::Pow(double base, int exponent){
   if(exponent == 0) return 1;
   double ans = 1;
   while(exponent > 0){
@@ -140,6 +167,10 @@ double Math::BasicComp::pow(double base, int exponent){
   base *= base;
   exponent = exponent >> 1;
   return ans;
+}
+
+double Math::BasicComp::LinePoint(const double slope, const double yInt, const double xOffset){
+  return (slope * xOffset) + yInt;
 }
 
 void Math::Equation::Normalize(char* equation){
@@ -163,8 +194,25 @@ void Math::Equation::Normalize(char* equation){
   this->len = nLen+1;
 }
 
+unsigned short Math::Equation::Priorities(unsigned short* const open, unsigned short* const close){
+  short oI = 0;
+  short cI = 0;
+  for(short i = 0; i < this->len; i++){
+    if(this->equation[i] == '('){
+      open[oI] = i;
+      oI++;
+    }
+    if(this->equation[i] == ')'){
+      close[cI] = i;
+      cI++;
+    }
+  }
+  if(oI != cI || this->len == 0) return 0;
+  else return oI + 1;
+}
+
 Math::Equation::Equation(char* equation){
-  Normalize(equation);
+  this->Normalize(equation);
 }
 
 Math::Equation::Equation(){
@@ -176,19 +224,12 @@ Math::Equation::~Equation(){
   delete[] this->equation;
 }
 
-void Math::Equation::operator=(Equation& cEquation){
-  this->Normalize(cEquation.equation);
+void Math::Equation::operator=(Equation* cEquation){
+  this->Normalize(cEquation->equation);
 }
 
-double Math::Equation::YIntercept(){
-  //add checking to make sure that the equation can actually be
-  //interpriated in a proper way either here or in Normalize
-  int opens[10] = {};
-  int openS = 0;
-  int closes[10] = {};
-  int closeS = 0;
-  for(int i = 0; i < this->len; i++){
-    if(this->equation[i] == '(') {opens[openS] = i; openS++;}
-    if(this->equation[i] == ')') {closes[closeS] = i; closeS++;}
-  }
-}
+// double Math::Equation::YIntercept(){
+//   unsigned short opens[10];
+//   unsigned short closes[10];
+//   unsigned short len = this->Priorities(opens, closes) - 1;
+// }
