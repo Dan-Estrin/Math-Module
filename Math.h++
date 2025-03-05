@@ -10,18 +10,24 @@ namespace Math{
     mType* vals;
 
     public:
-    Matrix(mType* vals, unsigned int rows, unsigned int columns);//DONE
-    Matrix(unsigned int rows, unsigned int columns);//DONE
+    //constructors & destructor
+    inline Matrix(mType* vals, unsigned int rows, unsigned int columns);//DONE
+    inline Matrix(unsigned int rows, unsigned int columns);//DONE
+    inline Matrix();//DONE
+    inline ~Matrix();//DONE
 
-    double GaussianDeterminate();//DONE
-    mType ElementAt(unsigned short index);
-    mType ElementAt(unsigned short row, unsigned short col);
-    Matrix();//DONE
-    ~Matrix();//DONE
+    //use methods
+    inline double GaussianDeterminate();//DONE
+    inline mType ElementAt(unsigned int index);//DONE
+    inline mType ElementAt(unsigned int row, unsigned int col);//DONE
+    inline void ChangeAt(unsigned int index, mType val);//UNTESTED
+    inline void ChangeAt(unsigned int row, unsigned int col, mType val);//UNTESTED
 
-    Matrix<mType> operator+(Matrix<mType>& mxt);//DONE
-    Matrix<mType> operator*(Matrix<mType>& mtx);//DONE
-    void operator=(Matrix<mType>& mtx);//DONE
+    //operator overloads
+    inline Matrix<mType> operator+(Matrix<mType>& mxt);//DONE
+    inline Matrix<mType> operator*(Matrix<mType>& mtx);//DONE
+    inline mType operator[](int index);//DONE
+    inline void operator=(Matrix<mType>& mtx);//DONE
   };
 
   class Equation{
@@ -29,7 +35,7 @@ namespace Math{
     unsigned short len;
     char* equation;
     void Normalize(char* equation);//DONE
-    unsigned short Priorities(unsigned short* const open, unsigned short* const close);
+    unsigned int Priorities(unsigned int* const open, unsigned int* const close);
 
     public:
     //TODO: create a parser for use in all these equation funcs
@@ -43,13 +49,12 @@ namespace Math{
     // char* DefIntegral(char voi);
   };
 
-  namespace BasicComp{
-    double Sqrt(double num);//DONE
-    double Sqrt(double num, unsigned char precision);//DONE
-    double CircleArea(double radius);//DONE
-    int Pow(int base, int exponent);//DONE
-    double Pow(double base, int exponent);//DONE
-    double LinePoint(const double slope, const double yInt, const double xOffset);
-  };
+  double Sqrt(double num);//DONE
+  double Sqrt(double num, unsigned int precision);//DONE
+  double CircleArea(double radius);//DONE
+  int Pow(int base, int exponent);//DONE
+  double Pow(double base, int exponent);//DONE
+  double LinePoint(const double slope, const double yInt, const double xOffset);
+  float ExpectedValue(const float* const probabilities, const float* const values, const int size);
 };
 #endif
