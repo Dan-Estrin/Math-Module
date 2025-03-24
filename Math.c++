@@ -8,7 +8,7 @@ Math::Matrix<mType>::Matrix(mType* vals, unsigned int rows, unsigned int columns
   this->cols = columns;
   this->vals = new mType[rows*columns];
   for(int i = 0; i < rows*columns; i++){
-      this->vals[i] = vals[i];
+    this->vals[i] = vals[i];
   }
 }
 
@@ -16,7 +16,7 @@ template <typename mType>
 Math::Matrix<mType>::Matrix(unsigned int rows, unsigned int columns){
   this->rows = rows;
   this->cols = columns;
-  this->vals = new int[rows*columns];
+  this->vals = new int[rows * columns];
 }
 
 template <typename mType>
@@ -31,8 +31,8 @@ void Math::Matrix<mType>::operator=(Matrix<mType>& mtx){
   this->rows = mtx.rows;
   this->cols = mtx.cols;
   this->vals = new mType[this->rows*this->cols];
-  for(int i = 0; i < this->rows*this->cols; i++){
-      this->vals[i] = mtx.vals[i];
+  for(int i = 0; i < this->rows * this->cols; i++){
+    this->vals[i] = mtx[i];
   }
 }
 
@@ -42,55 +42,66 @@ Math::Matrix<mType>::~Matrix(){
 }
 
 template <typename mType>
+Math::Matrix<mType> Math::Matrix<mType>::Transpose(){
+  mType tArray[this->rows * this->cols];
+  for(int i = 0; i < this->rows; i++){
+    for(int k = 0; k < this->cols; k++){
+      tArray[i + (k * this->rows)] = this->vals[k + (i * this->cols)];
+    }
+  }
+  return Math::Matrix<mType>(tArray, this->cols, this->rows);
+}
+
+template <typename mType>
 double Math::Matrix<mType>::GaussianDeterminate(){
   //impossible to find the determinate, return nothing
   if(this->rows != this->cols || this->rows == 1) throw(700);
   double valsC[this->rows * this->cols];
-  for(short z = 0; z < this->rows * this->cols; z++){
+  for(int z = 0; z < this->rows * this->cols; z++){
     //explicite cast to avoid bit loss
     valsC[z] = (double)this->vals[z];
   }
   //main row itteration step
-  for(short row = 0; row < this->rows-1; row++){
+  for(int row = 0; row < this->rows-1; row++){
     double* const pivot = valsC+(row*this->cols)+row;
     double* currFirst = pivot+this->cols;
     //pivot is 0 and the row must be swapped with the next one
     if(*pivot == 0){
-      for(short column = 0; column+row < this->cols; column++){
+      for(int column = 0; column+row < this->cols; column++){
         const double temp = *(pivot+column);
         *(pivot+column) = -*(currFirst+column);
         *(currFirst+column) = temp;
       }
     }
     //changing row itteration step
-    for(short currRow = row+1; currRow < this->rows; currRow++){
+    for(int currRow = row+1; currRow < this->rows; currRow++){
       const double multiplier = *currFirst/(*pivot);
       //element itteration step
-      for(short column = 0; column+row < this->cols; column++){
+      for(int column = 0; column+row < this->cols; column++){
         *(currFirst+column) = *(currFirst+column) - (*(pivot+column)*multiplier);
       }
       currFirst = currFirst + this->cols;
     }
   }
   double det = 1;
-  for(short diag = 0; diag < this->cols; diag++){
-    det *= valsC[(diag*this->cols)+diag];
+  for(int diag = 0; diag < this->cols; diag++){
+    det *= valsC[(diag * this->cols) + diag];
   }
   return det;
 }
 
 template <typename mType>
-mType Math::Matrix<mType>::ElementAt(unsigned short index){
-  if(index > this->rows*this->cols ||index <= 0) throw (700);
-  return this->vals[index-1];
+mType Math::Matrix<mType>::ElementAt(unsigned int index){
+  if(index > this->rows*this->cols ||index < 0) throw (700);
+  return this->vals[index];
 }
 
 template <typename mType>
-mType Math::Matrix<mType>::ElementAt(unsigned short row, unsigned short col){
+mType Math::Matrix<mType>::ElementAt(unsigned int row, unsigned int col){
   if(row > this->rows || col < this->col ||
-    row <= 0 || col <= 0
+    row < 0 || col < 0
   ) throw (700);
-  return this->vals[(this->cols*row) + col - 1];
+  return this->vals[(this->cols*row) + col];
 }
 
 template <typename mType>
@@ -119,6 +130,12 @@ Math::Matrix<mType> Math::Matrix<mType>::operator+(Math::Matrix<mType>& mtx){
     tArray[i] = this->vals[i] + mtx.vals[i];
   }
   return Math::Matrix<mType>(tArray, this->rows, this->cols);
+}
+
+template<typename mType>
+mType Math::Matrix<mType>::operator[](unsigned int index){
+  if(index > this->rows * this->cols || index < 0) throw (700);
+  return this->vals[index];
 }
 
 double Math::BasicComp::Sqrt(double num){
@@ -183,7 +200,7 @@ void Math::Equation::Normalize(char* equation){
     index++;
   }
   this->equation = new char[nLen+1];
-  unsigned short offset = 0;
+  unsigned int offset = 0;
   for(int i = 0; i < index; i++){
     if(equation[i] != ' '){
       this->equation[offset] = equation[i];
@@ -194,10 +211,10 @@ void Math::Equation::Normalize(char* equation){
   this->len = nLen+1;
 }
 
-unsigned short Math::Equation::Priorities(unsigned short* const open, unsigned short* const close){
-  short oI = 0;
-  short cI = 0;
-  for(short i = 0; i < this->len; i++){
+unsigned int Math::Equation::Priorities(unsigned int* const open, unsigned int* const close){
+  int oI = 0;
+  int cI = 0;
+  for(int i = 0; i < this->len; i++){
     if(this->equation[i] == '('){
       open[oI] = i;
       oI++;
@@ -229,7 +246,7 @@ void Math::Equation::operator=(Equation* cEquation){
 }
 
 // double Math::Equation::YIntercept(){
-//   unsigned short opens[10];
-//   unsigned short closes[10];
-//   unsigned short len = this->Priorities(opens, closes) - 1;
+//   unsigned int opens[10];
+//   unsigned int closes[10];
+//   unsigned int len = this->Priorities(opens, closes) - 1;
 // }
