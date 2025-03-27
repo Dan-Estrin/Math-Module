@@ -2,10 +2,13 @@
 
 template <typename mType>
 Math::Matrix<mType>::Matrix(mType* vals, unsigned int rows, unsigned int columns){
+  //refuses trivial matrix. encourages constant
   if(rows == 1 && columns == 1) throw 100;
+  //refuses impossible dimensions for a matrix
   if(rows < 0 || columns < 0) throw 101;
   this->rows = rows;
   this->cols = columns;
+  //populate matrix
   this->vals = new mType[rows*columns];
   for(int i = 0; i < rows*columns; i++){
     this->vals[i] = vals[i];
@@ -14,6 +17,10 @@ Math::Matrix<mType>::Matrix(mType* vals, unsigned int rows, unsigned int columns
 
 template <typename mType>
 Math::Matrix<mType>::Matrix(unsigned int rows, unsigned int columns){
+  //refuses trivial matrix. encourages constant
+  if(rows == 1 && columns == 1) throw 100;
+  //refuses impossible dimensions for a matriX
+  if(rows < 0 || columns < 0) throw 101;
   this->rows = rows;
   this->cols = columns;
   this->vals = new int[rows * columns];
@@ -30,10 +37,20 @@ template <typename mType>
 void Math::Matrix<mType>::operator=(Matrix<mType>& mtx){
   this->rows = mtx.rows;
   this->cols = mtx.cols;
-  this->vals = new mType[this->rows*this->cols];
+  this->vals = new mType[this->rows * this->cols];
   for(int i = 0; i < this->rows * this->cols; i++){
     this->vals[i] = mtx[i];
   }
+}
+
+template <typename mType>
+void Math::Matrix<mType>::ChangeAt(unsigned int index, mType val){
+  this->vals[index] = val;
+}
+
+template <typename mType>
+void Math::Matrix<mType>::ChangeAt(unsigned int row, unsigned int col, mType val){
+  this->vals[(this->cols*row) + col] = val;
 }
 
 template <typename mType>
@@ -62,29 +79,29 @@ double Math::Matrix<mType>::GaussianDeterminate(){
     valsC[z] = (double)this->vals[z];
   }
   //main row itteration step
-  for(int row = 0; row < this->rows-1; row++){
-    double* const pivot = valsC+(row*this->cols)+row;
-    double* currFirst = pivot+this->cols;
+  for(int row = 0; row < this->rows - 1; row++){
+    double* const pivot = valsC+(row * this->cols) + row;
+    double* currFirst = pivot + this->cols;
     //pivot is 0 and the row must be swapped with the next one
     if(*pivot == 0){
-      for(int column = 0; column+row < this->cols; column++){
-        const double temp = *(pivot+column);
-        *(pivot+column) = -*(currFirst+column);
-        *(currFirst+column) = temp;
+      for(int column = 0; column + row < this->cols; column++){
+        const double temp = *(pivot + column);
+        *(pivot + column) = -*(currFirst + column);
+        *(currFirst + column) = temp;
       }
     }
     //changing row itteration step
-    for(int currRow = row+1; currRow < this->rows; currRow++){
+    for(int currRow = row + 1; currRow < this->rows; currRow++){
       const double multiplier = *currFirst/(*pivot);
       //element itteration step
-      for(int column = 0; column+row < this->cols; column++){
-        *(currFirst+column) = *(currFirst+column) - (*(pivot+column)*multiplier);
+      for(int column = 0; column + row < this->cols; column++){
+        *(currFirst + column) = *(currFirst + column) - (*(pivot + column) * multiplier);
       }
       currFirst = currFirst + this->cols;
     }
   }
   double det = 1;
-  for(int diag = 0; diag < this->cols; diag++){
+  for(short diag = 0; diag < this->cols; diag++){
     det *= valsC[(diag * this->cols) + diag];
   }
   return det;
@@ -92,7 +109,7 @@ double Math::Matrix<mType>::GaussianDeterminate(){
 
 template <typename mType>
 mType Math::Matrix<mType>::ElementAt(unsigned int index){
-  if(index > this->rows*this->cols ||index < 0) throw (700);
+  if(index > this->rows * this->cols ||index <= 0) throw (700);
   return this->vals[index];
 }
 
@@ -101,7 +118,7 @@ mType Math::Matrix<mType>::ElementAt(unsigned int row, unsigned int col){
   if(row > this->rows || col < this->col ||
     row < 0 || col < 0
   ) throw (700);
-  return this->vals[(this->cols*row) + col];
+  return this->vals[(this->cols * row) + col];
 }
 
 template <typename mType>
@@ -133,12 +150,12 @@ Math::Matrix<mType> Math::Matrix<mType>::operator+(Math::Matrix<mType>& mtx){
 }
 
 template<typename mType>
-mType Math::Matrix<mType>::operator[](unsigned int index){
+inline mType Math::Matrix<mType>::operator[](int index){
   if(index > this->rows * this->cols || index < 0) throw (700);
   return this->vals[index];
 }
 
-double Math::BasicComp::Sqrt(double num){
+double Math::Sqrt(double num){
   if(num < 0) throw 101;
   double sqrt = 0;
   while(((sqrt+1)*(sqrt+1)) <= num){sqrt++;}
@@ -148,7 +165,7 @@ double Math::BasicComp::Sqrt(double num){
   return sqrt;
 }
 
-double Math::BasicComp::Sqrt(double num, unsigned char precision){
+double Math::Sqrt(double num, unsigned int precision){
   if(num < 0 || precision > 7) throw 101;
   double sqrt = 0;
   double precessor = 1;
@@ -159,12 +176,12 @@ double Math::BasicComp::Sqrt(double num, unsigned char precision){
   return sqrt;
 }
 
-double Math::BasicComp::CircleArea(double radius){
+double Math::CircleArea(double radius){
   if(radius < 0) throw 100;
   return 3.142*radius*radius;
 }
 
-int Math::BasicComp::Pow(int base, int exponent){
+int Math::Pow(int base, int exponent){
   if(exponent == 0) return 1;
   int ans = 1;
   while(exponent > 0){
@@ -175,7 +192,7 @@ int Math::BasicComp::Pow(int base, int exponent){
   return ans;
 }
 
-double Math::BasicComp::Pow(double base, int exponent){
+double Math::Pow(double base, int exponent){
   if(exponent == 0) return 1;
   double ans = 1;
   while(exponent > 0){
@@ -186,7 +203,7 @@ double Math::BasicComp::Pow(double base, int exponent){
   return ans;
 }
 
-double Math::BasicComp::LinePoint(const double slope, const double yInt, const double xOffset){
+double Math::LinePoint(const double slope, const double yInt, const double xOffset){
   return (slope * xOffset) + yInt;
 }
 
@@ -243,6 +260,14 @@ Math::Equation::~Equation(){
 
 void Math::Equation::operator=(Equation* cEquation){
   this->Normalize(cEquation->equation);
+}
+
+float Math::ExpectedValue(const float* const probabilities, const float* const values, const int size){
+  float ex;
+  for(int i = 0; i < size; i++){
+    ex += probabilities[i] * values[i];
+  }
+  return ex;
 }
 
 // double Math::Equation::YIntercept(){
