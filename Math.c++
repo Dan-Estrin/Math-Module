@@ -26,15 +26,8 @@ Math::Matrix<mType>::Matrix(unsigned int rows, unsigned int columns){
   this->vals = new int[rows * columns];
 }
 
-template <typename mType>
-Math::Matrix<mType>::Matrix(){
-  this->cols = 0;
-  this->rows = 0;
-  this->vals = nullptr;
-}
-
-template <typename mType>
-void Math::Matrix<mType>::operator=(Matrix<mType>& mtx){
+template<typename mType>
+Math::Matrix<mType>::Matrix(Matrix<mType>& mtx){
   this->rows = mtx.rows;
   this->cols = mtx.cols;
   this->vals = new mType[this->rows * this->cols];
@@ -44,18 +37,39 @@ void Math::Matrix<mType>::operator=(Matrix<mType>& mtx){
 }
 
 template <typename mType>
+Math::Matrix<mType>::Matrix(){
+  this->cols = 0;
+  this->rows = 0;
+  this->vals = nullptr;
+}
+
+template <typename mType>
+Math::Matrix<mType>::~Matrix(){
+  delete[] this->vals;
+}
+
+template <typename mType>
 void Math::Matrix<mType>::ChangeAt(unsigned int index, mType val){
   this->vals[index] = val;
 }
 
 template <typename mType>
 void Math::Matrix<mType>::ChangeAt(unsigned int row, unsigned int col, mType val){
-  this->vals[(this->cols*row) + col] = val;
+  this->vals[(this->cols * row) + col] = val;
 }
 
 template <typename mType>
-Math::Matrix<mType>::~Matrix(){
-  delete[] this->vals;
+mType Math::Matrix<mType>::ElementAt(unsigned int index){
+  if(index > this->rows * this->cols ||index <= 0) throw (700);
+  return this->vals[index];
+}
+
+template <typename mType>
+mType Math::Matrix<mType>::ElementAt(unsigned int row, unsigned int col){
+  if(row > this->rows || col < this->col ||
+    row < 0 || col < 0
+  ) throw (700);
+  return this->vals[(this->cols * row) + col];
 }
 
 template <typename mType>
@@ -69,20 +83,26 @@ Math::Matrix<mType> Math::Matrix<mType>::Transpose(){
   return Math::Matrix<mType>(tArray, this->cols, this->rows);
 }
 
-template <typename mType>
-double Math::Matrix<mType>::GaussianDeterminate(){
-  //impossible to find the determinate, return nothing
-  if(this->rows != this->cols || this->rows == 1) throw(700);
+template<typename mType>
+Math::Matrix<double> Math::Matrix<mType>::UpperTriangular(){
+  //temporary array for copying
   double valsC[this->rows * this->cols];
   for(int z = 0; z < this->rows * this->cols; z++){
     //explicite cast to avoid bit loss
-    valsC[z] = (double)this->vals[z];
+    valsC[z] = this->vals[z];
   }
   //main row itteration step
   for(int row = 0; row < this->rows - 1; row++){
-    double* const pivot = valsC+(row * this->cols) + row;
+    double* const pivot = valsC + (row * this->cols) + row;
     double* currFirst = pivot + this->cols;
     //pivot is 0 and the row must be swapped with the next one
+    if(*pivot == 0 && *currFirst == 0){
+      while(*currFirst == 0 &&
+        currFirst < valsC + ((this->rows - rows) * this->cols)
+      ){
+        currFirst = currFirst + this->cols;
+      }
+    }
     if(*pivot == 0){
       for(int column = 0; column + row < this->cols; column++){
         const double temp = *(pivot + column);
@@ -100,25 +120,44 @@ double Math::Matrix<mType>::GaussianDeterminate(){
       currFirst = currFirst + this->cols;
     }
   }
+  return Matrix<double>(valsC, this->rows, this->cols);
+}
+
+template <typename mType>
+double Math::Matrix<mType>::GaussianDeterminate(){
+  Matrix<double> temp = this->UpperTriangular();
   double det = 1;
   for(short diag = 0; diag < this->cols; diag++){
-    det *= valsC[(diag * this->cols) + diag];
+    det *= temp[(diag * this->cols) + diag];
   }
   return det;
 }
 
-template <typename mType>
-mType Math::Matrix<mType>::ElementAt(unsigned int index){
-  if(index > this->rows * this->cols ||index <= 0) throw (700);
-  return this->vals[index];
+template<typename mType>
+int Math::Matrix<mType>::Rank(){
+  Matrix<double> temp = this->UpperTriangular();
+  int rank = 0;
+  for(int r = 0; r < this->rows; r++){
+    bool zrow = false;
+    for(int c = 0; c < this->cols; c++){
+      if(temp[(this->cols * r) + c] != 0){
+        zrow = true;
+        break;
+      }
+    }
+    if(zrow) rank++;
+  }
+  return rank;
 }
 
 template <typename mType>
-mType Math::Matrix<mType>::ElementAt(unsigned int row, unsigned int col){
-  if(row > this->rows || col < this->col ||
-    row < 0 || col < 0
-  ) throw (700);
-  return this->vals[(this->cols * row) + col];
+void Math::Matrix<mType>::operator=(Matrix<mType>& mtx){
+  this->rows = mtx.rows;
+  this->cols = mtx.cols;
+  this->vals = new mType[this->rows * this->cols];
+  for(int i = 0; i < this->rows * this->cols; i++){
+    this->vals[i] = mtx[i];
+  }
 }
 
 template <typename mType>
@@ -207,6 +246,14 @@ double Math::LinePoint(const double slope, const double yInt, const double xOffs
   return (slope * xOffset) + yInt;
 }
 
+float Math::ExpectedValue(const float* const probabilities, const float* const values, const int size){
+  float ex;
+  for(int i = 0; i < size; i++){
+    ex += probabilities[i] * values[i];
+  }
+  return ex;
+}
+
 void Math::Equation::Normalize(char* equation){
   unsigned int index = 0;
   unsigned int nLen = 0;
@@ -260,14 +307,6 @@ Math::Equation::~Equation(){
 
 void Math::Equation::operator=(Equation* cEquation){
   this->Normalize(cEquation->equation);
-}
-
-float Math::ExpectedValue(const float* const probabilities, const float* const values, const int size){
-  float ex;
-  for(int i = 0; i < size; i++){
-    ex += probabilities[i] * values[i];
-  }
-  return ex;
 }
 
 // double Math::Equation::YIntercept(){

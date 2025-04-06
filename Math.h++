@@ -10,50 +10,53 @@ namespace Math{
 
     public:
     //constructors & destructor
-    inline Matrix(mType* vals, unsigned int rows, unsigned int columns);//DONE
-    inline Matrix(unsigned int rows, unsigned int columns);//DONE
-    inline Matrix();//DONE
-    inline ~Matrix();//DONE
+    inline Matrix(mType* vals, unsigned int rows, unsigned int columns);
+    inline Matrix(unsigned int rows, unsigned int columns);
+    inline Matrix(Matrix<mType>& mtx);
+    inline Matrix();
+    inline ~Matrix();
 
     //use methods
-    inline double GaussianDeterminate();//DONE
-    inline mType ElementAt(unsigned int index);//DONE
-    inline mType ElementAt(unsigned int row, unsigned int col);//DONE
+    inline Matrix<double> UpperTriangular();//
+    inline int Rank();//UNTESTED
+    inline double GaussianDeterminate();
+    inline mType ElementAt(unsigned int index);
+    inline mType ElementAt(unsigned int row, unsigned int col);
     inline void ChangeAt(unsigned int index, mType val);//UNTESTED
     inline void ChangeAt(unsigned int row, unsigned int col, mType val);//UNTESTED
-    inline Matrix<mType> Transpose();//DONE
+    inline Matrix<mType> Transpose();
 
     //operator overloads
-    inline Matrix<mType> operator+(Matrix<mType>& mxt);//DONE
-    inline Matrix<mType> operator*(Matrix<mType>& mtx);//DONE
-    inline mType operator[](int index);//DONE
-    inline void operator=(Matrix<mType>& mtx);//DONE
+    inline Matrix<mType> operator+(Matrix<mType>& mxt);
+    inline Matrix<mType> operator*(Matrix<mType>& mtx);
+    inline mType operator[](int index);
+    inline void operator=(Matrix<mType>& mtx);
   };
 
   class Equation{
     private:
     unsigned int len;
     char* equation;
-    void Normalize(char* equation);//DONE
+    void Normalize(char* equation);
     unsigned int Priorities(unsigned int* const open, unsigned int* const close);
 
     public:
     //TODO: create a parser for use in all these equation funcs
-    Equation(char* equation);//DONE
-    Equation();//DONE
-    ~Equation();//DONE
-    void operator=(Equation* cEquation);//DONE
+    Equation(char* equation);
+    Equation();
+    ~Equation();
+    void operator=(Equation* cEquation);
     double YIntercept();
     // char* Derivative(char vod);
     // char* InDefIntegral(char voi);
     // char* DefIntegral(char voi);
   };
 
-  double Sqrt(double num);//DONE
-  double Sqrt(double num, unsigned int precision);//DONE
-  double CircleArea(double radius);//DONE
-  int Pow(int base, int exponent);//DONE
-  double Pow(double base, int exponent);//DONE
+  double Sqrt(double num);
+  double Sqrt(double num, unsigned int precision);
+  double CircleArea(double radius);
+  int Pow(int base, int exponent);
+  double Pow(double base, int exponent);
   double LinePoint(const double slope, const double yInt, const double xOffset);
   float ExpectedValue(const float* const probabilities, const float* const values, const int size);
 };
