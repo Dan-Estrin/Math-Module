@@ -174,6 +174,21 @@ int Math::Matrix<mType>::Rank(){
    return rank;
 }
 
+template<typename mType>
+void Math::Matrix<mType>::AddRow(mType* row, int len){
+   if(this->cols != len) throw(700);
+   mType* buff = new mType[(this->rows * this->cols) + this->cols];
+   for(int i = 0; i < this->rows * this->cols; i++){
+      buff[i] = this->vals[i];
+   }
+   for(int j = 0; j < this->cols; j++){
+      buff[(this->rows * this->cols) + j] = row[j];
+   }
+   delete[] this->vals;
+   ++this->rows;
+   this->vals = buff;
+}
+
 template <typename mType>
 void Math::Matrix<mType>::operator=(Matrix<mType>& mtx){
    this->rows = mtx.rows;
