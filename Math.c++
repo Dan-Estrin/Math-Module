@@ -190,6 +190,28 @@ void Math::Matrix<mType>::AddRow(mType* row, int len){
 }
 
 template <typename mType>
+void Math::Matrix<mType>::AddColumn(mType* column, int len){
+   if(this->rows != len) throw(700);
+   mType* buff = new mType[(this->rows * this->cols) + this->rows];
+   ++this->cols;
+   int valIndex = 0;
+   int colIndex = 0;
+   for(int i = 0; i < (this->rows * this->cols) + this->rows; i++){
+      if(i%this->cols == (this->cols - 1)){
+         buff[i] = column[colIndex];
+         buff[i+1] = this->vals[valIndex];
+         colIndex++;
+      }
+      else{
+         buff[i] = this->vals[valIndex];
+         valIndex++;
+      }
+   }
+   delete[] this->vals;
+   this->vals = buff;
+}
+
+template <typename mType>
 void Math::Matrix<mType>::operator=(Matrix<mType>& mtx){
    this->rows = mtx.rows;
    this->cols = mtx.cols;

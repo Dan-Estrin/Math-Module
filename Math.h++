@@ -26,7 +26,8 @@ namespace Math{
       void ChangeAt(unsigned int index, mType val);
       void ChangeAt(unsigned int row, unsigned int col, mType val);
       Matrix<mType> Transpose();
-      void AddRow(mType* array, int len);
+      void AddRow(mType* row, int len);
+      void AddColumn(mType* column, int len);
 
       //operator overloads
       Matrix<mType> operator+(Matrix<mType>& mxt);
